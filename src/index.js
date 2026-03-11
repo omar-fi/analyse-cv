@@ -7,8 +7,10 @@ const { insertRecords } = require('./database');
 async function main() {
     const cvFileName = "CV_omar.pdf";
     const cvPath = path.join(__dirname, '../data/raw_cvs', cvFileName);
+    // Extraire l'ID du consultant du nom du fichier (ex: CV_omar.pdf -> omar)
+    const consultantId = cvFileName.replace('CV_', '').replace('.pdf', '').toLowerCase();
 
-    console.log(`🚀 Démarrage du pipeline pour : ${cvFileName}`);
+    console.log(`🚀 Démarrage du pipeline pour : ${cvFileName} (Consultant ID: ${consultantId})`);
 
     try {
         console.log('1️⃣ Lecture du PDF...');
@@ -19,7 +21,7 @@ async function main() {
         console.log('Données extraites :', JSON.stringify(structuredData, null, 2));
 
         console.log('3️⃣ Split du texte complet et génération des embeddings (3072 dimensions)...');
-        let records = await processTextToRecords(rawText, cvFileName);
+        let records = await processTextToRecords(rawText, cvFileName, consultantId);
 
         // ⚠️ CORRECTION ICI : On utilise les nouveaux noms de variables et on sécurise avec || []
         records = records.map(record => ({

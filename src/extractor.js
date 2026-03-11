@@ -2,7 +2,8 @@ const { ChatOpenAI } = require('@langchain/openai');
 const { PromptTemplate } = require('@langchain/core/prompts');
 const { StructuredOutputParser } = require('@langchain/core/output_parsers');
 const { z } = require('zod');
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const parser = StructuredOutputParser.fromZodSchema(
     z.object({
@@ -14,13 +15,12 @@ const parser = StructuredOutputParser.fromZodSchema(
     })
 );
 const model = new ChatOpenAI({
-    model: process.env.OPENROUTER_MODEL || "openai/gpt-4.1-mini",
+    model: process.env.OPENROUTER_MODEL || "openai/gpt-4-turbo-preview",
     apiKey: process.env.OPENROUTER_API_KEY,
     temperature: 0,
     maxTokens: Number(process.env.OPENROUTER_MAX_TOKENS || 2048),
     configuration: {
         baseURL: "https://openrouter.ai/api/v1",
-
         defaultHeaders: {
             "HTTP-Referer": "http://localhost", 
             "X-Title": "cv-vector-db",
@@ -28,11 +28,7 @@ const model = new ChatOpenAI({
     },
 });
 
-function extractJsonFromMarkdown(text) {
-    if (!text) return text;
-    let cleaned = text.replace(/```json/gi, "").replace(/```/g, "");
-    return cleaned.trim();
-}
+
 async function extractStructuredData(rawText) {
     const formatInstructions = parser.getFormatInstructions();
 
