@@ -1,27 +1,25 @@
 const { RecursiveCharacterTextSplitter } = require('@langchain/textsplitters');
-const { OpenAIEmbeddings } = require('@langchain/openai');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 require('dotenv').config();
 
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-embedding-001" });
+
 const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize: 600,
+    chunkSize: 800,
     chunkOverlap: 100,
 });
 
-const embeddings = new OpenAIEmbeddings({
-    apiKey: process.env.OPENROUTER_API_KEY, 
-    modelName: "openai/text-embedding-3-small", 
-    configuration: {
-        baseURL: "https://openrouter.ai/api/v1" 
-    }
-});
-
 async function processTextToRecords(text, sourceName) {
+    console.log(`\n⏳ Vectorisation des données (Vecteurs de 3072 dimensions)...`);
     const chunks = await splitter.createDocuments([text]);
     const records = [];
     
     for (let i = 0; i < chunks.length; i++) {
         const chunkText = chunks[i].pageContent;
-        const vector = await embeddings.embedQuery(chunkText);
+        
+        const result = await model.embedContent(chunkText);
+        const vector = result.embedding.values;
         
         records.push({
             id: `${sourceName}-chunk-${i}`,

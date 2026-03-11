@@ -14,20 +14,23 @@ async function main() {
         console.log('1️⃣ Lecture du PDF...');
         const rawText = await extractTextFromPDF(cvPath);
 
-        console.log('2️⃣ Extraction intelligente (LLM) des compétences, formations et expériences...');
+        console.log('2️⃣ Extraction intelligente (LLM) des mots-clés, formations et expériences...');
         const structuredData = await extractStructuredData(rawText);
         console.log('Données extraites :', JSON.stringify(structuredData, null, 2));
 
-        console.log('3️⃣ Split du texte complet et génération des embeddings...');
+        console.log('3️⃣ Split du texte complet et génération des embeddings (3072 dimensions)...');
         let records = await processTextToRecords(rawText, cvFileName);
 
+        // ⚠️ CORRECTION ICI : On utilise les nouveaux noms de variables et on sécurise avec || []
         records = records.map(record => ({
             ...record,
-            competences_str: structuredData.competences.join(', '),
-            formation_str: structuredData.formation.join(' | '),
+            mots_cles_profil_str: (structuredData.mots_cles_profil || []).join(', '),
+            mots_cles_experience_str: (structuredData.mots_cles_experience || []).join(', '),
+            competences_generales_str: (structuredData.competences_generales || []).join(', '),
+            formation_str: (structuredData.formation || []).join(' | '),
         }));
 
-        console.log(`5️⃣ Insertion de ${records.length} chunks enrichis dans LanceDB...`);
+        console.log(`4️⃣ Insertion de ${records.length} chunks enrichis dans LanceDB...`);
         await insertRecords(records);
 
         console.log('✅ Pipeline terminé avec succès !');
