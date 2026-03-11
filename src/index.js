@@ -1,8 +1,12 @@
-const path = require('path');
-const { extractTextFromPDF } = require('./parser');
-const { extractStructuredData } = require('./extractor');
-const { processTextToRecords } = require('./processor');
-const { insertRecords } = require('./database');
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { extractTextFromPDF } from './parser.js';
+import { extractStructuredData } from './extractor.js';
+import { processTextToRecords } from './processor.js';
+import { insertRecords } from './database.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function main() {
     const cvFileName = "CV_omar.pdf";

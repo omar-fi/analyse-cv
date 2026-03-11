@@ -1,10 +1,14 @@
-const lancedb = require('vectordb');
-const path = require('path');
+import lancedb from 'vectordb';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DB_PATH = path.join(__dirname, '../data/lancedb');
 const TABLE_NAME = 'cv_embeddings';
 
-async function insertRecords(records) {
+export async function insertRecords(records) {
     const db = await lancedb.connect(DB_PATH);
     
     const tableNames = await db.tableNames();
@@ -18,5 +22,3 @@ async function insertRecords(records) {
         console.log(`✅ Table '${TABLE_NAME}' créée avec ${records.length} embeddings.`);
     }
 }
-
-module.exports = { insertRecords };

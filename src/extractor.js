@@ -1,9 +1,15 @@
-const { ChatOpenAI } = require('@langchain/openai');
-const { PromptTemplate } = require('@langchain/core/prompts');
-const { StructuredOutputParser } = require('@langchain/core/output_parsers');
-const { z } = require('zod');
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+import { ChatOpenAI } from '@langchain/openai';
+import { PromptTemplate } from '@langchain/core/prompts';
+import { StructuredOutputParser } from '@langchain/core/output_parsers';
+import { z } from 'zod';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const parser = StructuredOutputParser.fromZodSchema(
     z.object({
@@ -29,7 +35,7 @@ const model = new ChatOpenAI({
 });
 
 
-async function extractStructuredData(rawText) {
+export async function extractStructuredData(rawText) {
     const formatInstructions = parser.getFormatInstructions();
 
     const prompt = new PromptTemplate({
@@ -54,5 +60,3 @@ Instructions de formatage strict : {format_instructions}`,
         throw error;
     }
 }
-
-module.exports = { extractStructuredData };

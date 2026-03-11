@@ -1,7 +1,13 @@
-const { RecursiveCharacterTextSplitter } = require('@langchain/textsplitters');
-const { OpenAIEmbeddings } = require('@langchain/openai');
-const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters';
+import { OpenAIEmbeddings } from '@langchain/openai';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const embeddings = new OpenAIEmbeddings({
     apiKey: process.env.OPENROUTER_API_KEY,
@@ -20,7 +26,7 @@ const splitter = new RecursiveCharacterTextSplitter({
     chunkOverlap: 100,
 });
 
-async function processTextToRecords(text, sourceName, consultantId) {
+export async function processTextToRecords(text, sourceName, consultantId) {
     console.log(`\n⏳ Vectorisation des données...`);
     const chunks = await splitter.createDocuments([text]);
     const records = [];
@@ -40,5 +46,3 @@ async function processTextToRecords(text, sourceName, consultantId) {
     
     return records;
 }
-
-module.exports = { processTextToRecords };

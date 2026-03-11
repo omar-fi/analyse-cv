@@ -1,6 +1,6 @@
-const PDFParser = require("pdf2json");
+import PDFParser from 'pdf2json';
 
-async function extractTextFromPDF(filePath) {
+export async function extractTextFromPDF(filePath) {
     return new Promise((resolve, reject) => {
         const pdfParser = new PDFParser(this, 1); 
 
@@ -17,5 +17,3 @@ async function extractTextFromPDF(filePath) {
         pdfParser.loadPDF(filePath);
     });
 }
-
-module.exports = { extractTextFromPDF };
